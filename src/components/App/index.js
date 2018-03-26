@@ -1,39 +1,12 @@
 import React, { Component } from 'react';
+import { connect } from 'react-redux';
+import { bindActionCreators } from 'redux';
 import logo from './logo.svg';
-import faker from 'faker';
+import { actionCreators } from '../../actions';
 import './App.css';
 import PeopleList from '../PeopleList';
 
 class App extends Component {
-  constructor(props) {
-    super(props);
-
-    this.state = {
-      people: []
-    };
-
-    this.addPerson = this.addPerson.bind(this);
-    this.removePerson = this.removePerson.bind(this);
-  }
-
-  addPerson() {
-    const person = {
-      first: faker.name.firstName(),
-      last: faker.name.lastName(),
-      title: faker.name.jobTitle(),
-      bio: faker.lorem.sentence(),
-      id: faker.random.uuid()
-    }
-
-    const { people } = this.state;
-    people.unshift(person);
-    this.setState({ people });
-  }
-
-  removePerson(uuid) {
-    const people = this.state.people.filter(person => person.id !== uuid);
-    this.setState({ people });
-  }
 
   render() {
     return (
@@ -43,7 +16,7 @@ class App extends Component {
             src={logo}
             className="App-logo"
             alt="logo"
-            onClick={this.addPerson}
+            onClick={this.props.actions.addPerson}
           />
           <h1 className="App-title">Welcome to React People</h1>
         </header>
@@ -51,11 +24,21 @@ class App extends Component {
           <p className="App-intro">
             Click the React logo to add people. Click their card to remove them.
           </p>
-          <PeopleList people={this.state.people} removePerson={this.removePerson} />
+          <PeopleList people={this.props.people} removePerson={this.props.actions.removePerson} />
         </div>
       </div>
     );
   }
 }
 
-export default App;
+const mapStateToProps = (state) => {
+  return {
+    people: state.people
+  }
+}
+
+const mapDispatchToProps = (dispatch) => {
+  return { actions: bindActionCreators(actionCreators, dispatch) }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(App);
